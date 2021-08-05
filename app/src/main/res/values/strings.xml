@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">跳过WiFi认证 - 三星</string>
+    <string name="accessibility_description">当连接到需要认证的WiFi时，会出现“登录至WLAN网络”的提示，本辅助功能用以跳过该提示，以供其他APP（如直连校园网）进行wifi认证。</string>
+</resources>
