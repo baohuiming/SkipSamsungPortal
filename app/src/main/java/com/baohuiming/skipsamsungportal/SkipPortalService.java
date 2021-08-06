@@ -5,7 +5,9 @@ import android.os.Build;
 //import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+
 import androidx.annotation.RequiresApi;
+
 import java.util.List;
 
 public class SkipPortalService extends AccessibilityService {
@@ -35,6 +37,9 @@ public class SkipPortalService extends AccessibilityService {
                 //Log.d(TAG, "打开wifi认证界面");
                 status = "Login";
                 break;
+            case "com.android.settings.Settings$ConnectionsSettingsActivity":
+                status = "Connection";
+                break;
         }
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root != null) {
@@ -45,13 +50,16 @@ public class SkipPortalService extends AccessibilityService {
                 case "Login":
                     clickMore(root);
                     break;
+                case "Connection":
+                    clickQuitConnection(root);
+                    break;
             }
             clickDirect(root);
         }
     }
 
     public void clickConnectedWifi(AccessibilityNodeInfo root) {
-        // 点击“登录网络”按钮
+        // 点击“登录网络”按钮，或退出界面
         List<AccessibilityNodeInfo> connected_list = root.
                 findAccessibilityNodeInfosByViewId("com.android.settings:id/connected_list");
         //Log.d(TAG, "已连接的WiFi数量:" + connected_list.size());
@@ -60,12 +68,36 @@ public class SkipPortalService extends AccessibilityService {
             if (viewGroupNode.getChildCount() != 0) {
                 AccessibilityNodeInfo clickableLinearLayoutNode = viewGroupNode.getChild(0);
                 List<AccessibilityNodeInfo> titleNodes = root.findAccessibilityNodeInfosByViewId("com.android.settings:id/title");
+                List<AccessibilityNodeInfo> summaryNodes = root.findAccessibilityNodeInfosByViewId("com.android.settings:id/summary");
+                AccessibilityNodeInfo titleNode = null;
                 if (titleNodes.size() != 0) {
-                    AccessibilityNodeInfo titleNode = titleNodes.get(0);
-                    if (titleNode.getText().toString().contains(".wlan.bjtu")) {
-                        clickableLinearLayoutNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    titleNode = titleNodes.get(0);
+                }
+
+                if (summaryNodes.size() != 0) {
+                    AccessibilityNodeInfo summaryNode = summaryNodes.get(0);
+                    if (summaryNode.getText().toString().contains("登录网络")) {
+                        if (titleNode != null) {
+                            try {
+                                if (titleNode.getText().toString().contains(".wlan.bjtu")) {
+                                    clickableLinearLayoutNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                                }
+                            } catch (Exception ignore) {
+                            }
+                        }
+                    } else if (summaryNode.getText().toString().contains("已连接")) {
+                        //点击“向上导航”
+                        if (titleNode != null) {
+                            try {
+                                if (titleNode.getText().toString().contains(".wlan.bjtu")) {
+                                    clickBack(root);
+                                }
+                            } catch (Exception ignore) {
+                            }
+                        }
                     }
                 }
+
             }
         }
     }
@@ -94,6 +126,28 @@ public class SkipPortalService extends AccessibilityService {
                 texts.get(1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 // 退出程序
                 exit();
+            }
+        }
+    }
+
+    public void clickBack(AccessibilityNodeInfo root) {
+        //点击“向上导航”
+        List<AccessibilityNodeInfo> bars = root.findAccessibilityNodeInfosByViewId("com.android.settings:id/action_bar");
+        if (bars.size() != 0) {
+            AccessibilityNodeInfo bar = bars.get(0);
+            bar.getChild(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        }
+    }
+
+    public void clickQuitConnection(AccessibilityNodeInfo root) {
+        List<AccessibilityNodeInfo> summaryNodes = root.findAccessibilityNodeInfosByViewId("android:id/summary");
+        if (summaryNodes.size() != 0) {
+            try {
+                AccessibilityNodeInfo summaryNode = summaryNodes.get(0);
+                if (summaryNode.getText().toString().contains(".wlan.bjtu")) {
+                    clickBack(root);
+                }
+            } catch (Exception ignore) {
             }
         }
     }
