@@ -1,6 +1,8 @@
 package com.baohuiming.skipsamsungportal;
 
 import android.accessibilityservice.AccessibilityService;
+/*import android.content.Intent;
+import android.net.Uri;*/
 import android.os.Build;
 //import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -50,9 +52,9 @@ public class SkipPortalService extends AccessibilityService {
                 case "Login":
                     clickMore(root);
                     break;
-                case "Connection":
+                /*case "Connection":
                     clickQuitConnection(root);
-                    break;
+                    break;*/
             }
             clickDirect(root);
         }
@@ -85,17 +87,16 @@ public class SkipPortalService extends AccessibilityService {
                             } catch (Exception ignore) {
                             }
                         }
-                    } else if (summaryNode.getText().toString().contains("已连接")) {
+                    }/* else if (summaryNode.getText().toString().contains("已连接")) {
                         //点击“向上导航”
                         if (titleNode != null) {
-                            try {
-                                if (titleNode.getText().toString().contains(".wlan.bjtu")) {
-                                    clickBack(root);
-                                }
-                            } catch (Exception ignore) {
+                            if (titleNode.getText().toString().contains(".wlan.bjtu")) {
+                                //clickBack(root);
+                                //intentToOtherApp();
                             }
+
                         }
-                    }
+                    }*/
                 }
 
             }
@@ -111,7 +112,10 @@ public class SkipPortalService extends AccessibilityService {
             if (bar.getChildCount() > 2) {
                 //Log.d(TAG, String.valueOf(bar.getChildCount()));
                 AccessibilityNodeInfo btn = bar.getChild(2);
-                btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                try {
+                    btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                } catch (Exception ignore) {
+                }
             }
         }
     }
@@ -123,34 +127,45 @@ public class SkipPortalService extends AccessibilityService {
         if (texts.size() > 1) {
             if (texts.get(1).getText().equals(buttonText)) {
                 //Log.d(TAG,"找到了！");
-                texts.get(1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                try {
+                    texts.get(1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                } catch (Exception ignore) {
+                }
                 // 退出程序
                 exit();
             }
         }
     }
 
-    public void clickBack(AccessibilityNodeInfo root) {
+    /*public void clickBack(AccessibilityNodeInfo root) {
         //点击“向上导航”
         List<AccessibilityNodeInfo> bars = root.findAccessibilityNodeInfosByViewId("com.android.settings:id/action_bar");
         if (bars.size() != 0) {
             AccessibilityNodeInfo bar = bars.get(0);
             bar.getChild(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
-    }
+    }*/
 
-    public void clickQuitConnection(AccessibilityNodeInfo root) {
+    /*public void clickQuitConnection(AccessibilityNodeInfo root) {
         List<AccessibilityNodeInfo> summaryNodes = root.findAccessibilityNodeInfosByViewId("android:id/summary");
         if (summaryNodes.size() != 0) {
             try {
                 AccessibilityNodeInfo summaryNode = summaryNodes.get(0);
                 if (summaryNode.getText().toString().contains(".wlan.bjtu")) {
-                    clickBack(root);
+                    //clickBack(root);
                 }
             } catch (Exception ignore) {
             }
         }
-    }
+    }*/
+
+    /*public void intentToOtherApp() {
+        Uri uri = Uri.parse("baohuiming://com.baohuiming.autowifi");
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        //throw new NullPointerException();
+    }*/
 
     public void exit() {
         // 退出程序
