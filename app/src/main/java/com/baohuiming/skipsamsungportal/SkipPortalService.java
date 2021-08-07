@@ -78,16 +78,17 @@ public class SkipPortalService extends AccessibilityService {
 
                 if (summaryNodes.size() != 0) {
                     AccessibilityNodeInfo summaryNode = summaryNodes.get(0);
-                    if (summaryNode.getText().toString().contains("登录网络")) {
-                        if (titleNode != null) {
-                            try {
+                    try {
+                        if (summaryNode.getText().toString().contains("登录网络")) {
+                            if (titleNode != null) {
                                 if (titleNode.getText().toString().contains(".wlan.bjtu")) {
                                     clickableLinearLayoutNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                                 }
-                            } catch (Exception ignore) {
                             }
                         }
-                    }/* else if (summaryNode.getText().toString().contains("已连接")) {
+                    } catch (Exception ignore) {
+                    }
+                    /* else if (summaryNode.getText().toString().contains("已连接")) {
                         //点击“向上导航”
                         if (titleNode != null) {
                             if (titleNode.getText().toString().contains(".wlan.bjtu")) {
@@ -125,14 +126,14 @@ public class SkipPortalService extends AccessibilityService {
         List<AccessibilityNodeInfo> texts = root.
                 findAccessibilityNodeInfosByViewId("android:id/title");
         if (texts.size() > 1) {
-            if (texts.get(1).getText().equals(buttonText)) {
-                //Log.d(TAG,"找到了！");
-                try {
+            try {
+                if (texts.get(1).getText().equals(buttonText)) {
+                    //Log.d(TAG,"找到了！");
                     texts.get(1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                } catch (Exception ignore) {
+                    // 退出程序
+                    exit();
                 }
-                // 退出程序
-                exit();
+            } catch (Exception ignore) {
             }
         }
     }
