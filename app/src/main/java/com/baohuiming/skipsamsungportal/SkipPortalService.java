@@ -113,8 +113,11 @@ public class SkipPortalService extends AccessibilityService {
             if (bar.getChildCount() > 2) {
                 //Log.d(TAG, String.valueOf(bar.getChildCount()));
                 AccessibilityNodeInfo btn = bar.getChild(2);
+                AccessibilityNodeInfo title = bar.getChild(0);
                 try {
-                    btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    if (title.getText().toString().contains(".wlan.bjtu")){
+                        btn.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    }
                 } catch (Exception ignore) {
                 }
             }
